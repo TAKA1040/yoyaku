@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { AdminList } from '@/components/AdminList'
 import { TimelineView } from '@/components/TimelineView'
@@ -36,7 +36,8 @@ interface Booking {
   }
 }
 
-export default function ManagePage() {
+// 内部コンポーネント（useSearchParamsを使用）
+function ManageContent() {
   const [viewMode, setViewMode] = useState<'list' | 'timeline'>('timeline')
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(false)
@@ -255,5 +256,14 @@ export default function ManagePage() {
         </div>
       </div>
     </div>
+  )
+}
+
+// メインページコンポーネント（Suspenseでラップ）
+export default function ManagePage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center p-4">読み込み中...</div>}>
+      <ManageContent />
+    </Suspense>
   )
 }
