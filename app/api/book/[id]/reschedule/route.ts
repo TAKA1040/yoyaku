@@ -36,8 +36,14 @@ export async function POST(
     // リクエストデータ検証
     const validatedData = rescheduleSchema.parse(body)
 
+    if (!supabaseAdmin) {
+      return NextResponse.json(
+        { error: 'データベース接続エラー' },
+        { status: 500 }
+      )
+    }
 
-    const { data: booking, error: fetchError } = await supabaseAdmin
+    const { data: booking, error: fetchError } = await (supabaseAdmin as any)
       .from('bookings')
       .select(`
         *,
@@ -65,7 +71,7 @@ export async function POST(
     // メニュー変更がある場合は新しいメニュー取得
     let menu = booking.menu
     if (validatedData.menu_id && validatedData.menu_id !== booking.menu_id) {
-      const { data: newMenu, error: menuError } = await supabaseAdmin
+      const { data: newMenu, error: menuError } = await (supabaseAdmin as any)
         .from('menus')
         .select('*')
         .eq('id', validatedData.menu_id)
@@ -113,7 +119,7 @@ export async function POST(
     let assignedStaffId = booking.staff_id
 
     // 既存予約の重複チェック（自分の予約は除外）
-    const { data: existingBookings, error: checkError } = await supabaseAdmin
+    const { data: existingBookings, error: checkError } = await (supabaseAdmin as any)
       .from('bookings')
       .select('start_ts, end_ts, staff_id')
       .eq('staff_id', assignedStaffId)
@@ -157,7 +163,7 @@ export async function POST(
     }
 
     // 予約更新
-    const { error: updateError } = await supabaseAdmin
+    const { error: updateError } = await (supabaseAdmin as any)
       .from('bookings')
       .update({
         menu_id: menu.id,
@@ -186,7 +192,7 @@ export async function POST(
     }
 
     // 更新された予約情報を取得
-    const { data: updatedBooking } = await supabaseAdmin
+    const { data: updatedBooking } = await (supabaseAdmin as any)
       .from('bookings')
       .select(`
         *,
@@ -247,9 +253,16 @@ export async function GET(
       )
     }
 
+    if (!supabaseAdmin) {
+      return NextResponse.json(
+        { error: 'データベース接続エラー' },
+        { status: 500 }
+      )
+    }
+
     // 予約情報とメニュー一覧を取得
     const [bookingResult, menusResult] = await Promise.all([
-      supabaseAdmin
+      (supabaseAdmin as any)
         .from('bookings')
         .select(`
           *,
@@ -259,7 +272,7 @@ export async function GET(
         `)
         .eq('id', bookingId)
         .single(),
-      supabaseAdmin
+      (supabaseAdmin as any)
         .from('menus')
         .select('*')
         .order('name')
