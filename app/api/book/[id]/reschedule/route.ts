@@ -136,7 +136,7 @@ export async function POST(
     }
 
     // 元のスタッフで重複チェック
-    const hasConflict = existingBookings?.some(existingBooking =>
+    const hasConflict = existingBookings?.some((existingBooking: any) =>
       isTimeOverlapping(
         newStartTime.toISOString(),
         newEndTime.toISOString(),
