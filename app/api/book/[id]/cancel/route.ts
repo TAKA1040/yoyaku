@@ -39,6 +39,12 @@ export async function POST(
       )
     }
 
+    if (!supabaseAdmin) {
+      return NextResponse.json(
+        { error: 'データベース接続エラー' },
+        { status: 500 }
+      )
+    }
 
     const { data: booking, error: fetchError } = await supabaseAdmin
       .from('bookings')
@@ -130,6 +136,13 @@ export async function GET(
       return NextResponse.json(
         { error: '無効な認証トークンです' },
         { status: 401 }
+      )
+    }
+
+    if (!supabaseAdmin) {
+      return NextResponse.json(
+        { error: 'データベース接続エラー' },
+        { status: 500 }
       )
     }
 
