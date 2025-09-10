@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { AdminList } from '@/components/AdminList'
 import { TimelineView } from '@/components/TimelineView'
@@ -114,7 +114,7 @@ function ManageContent() {
     return bookings
   }
 
-  const loadBookings = async () => {
+  const loadBookings = useCallback(async () => {
     setLoading(true)
     try {
       // 実際の実装では API を呼び出し
@@ -126,11 +126,11 @@ function ManageContent() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     loadBookings()
-  }, [])
+  }, [loadBookings])
 
   // URLパラメータをチェックして通知パネルを自動で開く
   useEffect(() => {
