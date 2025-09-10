@@ -1,23 +1,20 @@
 import { createClient } from '@supabase/supabase-js'
 
-// 開発環境では実際のSupabaseを使わずモックデータを使用
-const isDev = process.env.NODE_ENV === 'development'
+// 環境変数を取得
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
-// 環境変数を安全に取得
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || 'http://localhost:54321'
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'dummy-service-role-key'
-
-// サーバーサイド専用クライアント（service role使用） - 開発環境ではダミー
-export const supabaseAdmin = isDev ? null : createClient(supabaseUrl, supabaseServiceRoleKey, {
+// サーバーサイド専用クライアント（service role使用）
+export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey, {
   auth: {
     autoRefreshToken: false,
     persistSession: false,
   },
 })
 
-// フロントエンド用クライアント（anon key使用、将来の認証機能用） - 開発環境ではダミー
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'dummy-anon-key'
-export const supabase = isDev ? null : createClient(supabaseUrl, supabaseAnonKey)
+// フロントエンド用クライアント（anon key使用）
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // 型定義
 export interface Patient {

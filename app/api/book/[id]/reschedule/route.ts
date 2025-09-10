@@ -36,10 +36,6 @@ export async function POST(
     // リクエストデータ検証
     const validatedData = rescheduleSchema.parse(body)
 
-    // 既存予約取得
-    if (!supabaseAdmin) {
-      return NextResponse.json({ error: 'Database not available' }, { status: 503 })
-    }
 
     const { data: booking, error: fetchError } = await supabaseAdmin
       .from('bookings')

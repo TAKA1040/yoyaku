@@ -3,8 +3,6 @@ import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import { supabaseAdmin, BusinessHour, StaffSchedule, Booking } from './db'
 
-const isDev = process.env.NODE_ENV === 'development'
-
 dayjs.extend(utc)
 dayjs.extend(timezone)
 
@@ -20,19 +18,6 @@ export interface TimeSlot {
 
 // 営業時間チェック
 export async function getBusinessHours(): Promise<BusinessHour[]> {
-  if (isDev || !supabaseAdmin) {
-    // 開発環境用のモックデータ
-    return [
-      { id: 1, weekday: 1, open_time: '09:00', close_time: '18:00', is_closed: false },
-      { id: 2, weekday: 2, open_time: '09:00', close_time: '18:00', is_closed: false },
-      { id: 3, weekday: 3, open_time: '09:00', close_time: '18:00', is_closed: false },
-      { id: 4, weekday: 4, open_time: '09:00', close_time: '18:00', is_closed: false },
-      { id: 5, weekday: 5, open_time: '09:00', close_time: '18:00', is_closed: false },
-      { id: 6, weekday: 6, open_time: '09:00', close_time: '17:00', is_closed: false },
-      { id: 7, weekday: 0, open_time: '09:00', close_time: '17:00', is_closed: true }
-    ]
-  }
-  
   const { data, error } = await supabaseAdmin
     .from('business_hours')
     .select('*')
@@ -45,21 +30,6 @@ export async function getBusinessHours(): Promise<BusinessHour[]> {
 // 指定日の営業時間を取得
 export async function getBusinessHoursForDate(date: string): Promise<{ openTime: string; closeTime: string; isClosed: boolean }> {
   const weekday = dayjs(date).day() // 0=Sunday, 1=Monday, ...
-  
-  if (isDev || !supabaseAdmin) {
-    // 開発環境用のモックデータ
-    const mockHours = [
-      { weekday: 1, openTime: '09:00', closeTime: '18:00', isClosed: false },
-      { weekday: 2, openTime: '09:00', closeTime: '18:00', isClosed: false },
-      { weekday: 3, openTime: '09:00', closeTime: '18:00', isClosed: false },
-      { weekday: 4, openTime: '09:00', closeTime: '18:00', isClosed: false },
-      { weekday: 5, openTime: '09:00', closeTime: '18:00', isClosed: false },
-      { weekday: 6, openTime: '09:00', closeTime: '17:00', isClosed: false },
-      { weekday: 0, openTime: '09:00', closeTime: '17:00', isClosed: true }
-    ]
-    const dayHours = mockHours.find(h => h.weekday === weekday)
-    return dayHours || { openTime: '09:00', closeTime: '18:00', isClosed: true }
-  }
   
   const { data, error } = await supabaseAdmin
     .from('business_hours')
@@ -81,11 +51,6 @@ export async function getBusinessHoursForDate(date: string): Promise<{ openTime:
 
 // スタッフの勤務スケジュール取得
 export async function getStaffSchedule(staffId: string, date: string): Promise<StaffSchedule | null> {
-  if (isDev || !supabaseAdmin) {
-    // 開発環境では通常勤務として扱う
-    return null
-  }
-  
   const { data, error } = await supabaseAdmin
     .from('staff_schedules')
     .select('*')
@@ -99,11 +64,6 @@ export async function getStaffSchedule(staffId: string, date: string): Promise<S
 
 // 指定日・スタッフの既存予約を取得
 export async function getExistingBookings(staffId: string, date: string): Promise<Booking[]> {
-  if (isDev || !supabaseAdmin) {
-    // 開発環境では空の配列を返す（既存予約なし）
-    return []
-  }
-  
   const startOfDay = dayjs(date).tz(TZ).startOf('day').toISOString()
   const endOfDay = dayjs(date).tz(TZ).endOf('day').toISOString()
   
@@ -152,35 +112,20 @@ export async function generateAvailableSlots(
     return []
   }
   
-  let staffs: any[] = []
+  // スタッフ一覧取得（指名ありなら対象スタッフのみ）
+  const staffQuery = supabaseAdmin
+    .from('staffs')
+    .select('*')
+    .eq('is_active', true)
   
-  if (isDev || !supabaseAdmin) {
-    // 開発環境用のモックスタッフデータ
-    staffs = [
-      { id: 'staff-1', name: '田中', is_active: true, is_public: true, max_parallel: 3 },
-      { id: 'staff-2', name: '佐藤', is_active: true, is_public: true, max_parallel: 2 },
-      { id: 'staff-3', name: '鈴木', is_active: true, is_public: true, max_parallel: 3 }
-    ]
-    if (staffId) {
-      staffs = staffs.filter(s => s.id === staffId)
-    }
+  if (staffId) {
+    staffQuery.eq('id', staffId)
   } else {
-    // スタッフ一覧取得（指名ありなら対象スタッフのみ）
-    const staffQuery = supabaseAdmin
-      .from('staffs')
-      .select('*')
-      .eq('is_active', true)
-    
-    if (staffId) {
-      staffQuery.eq('id', staffId)
-    } else {
-      staffQuery.eq('is_public', true) // 指名可能なスタッフのみ
-    }
-    
-    const { data: staffData, error: staffError } = await staffQuery
-    if (staffError || !staffData) return []
-    staffs = staffData
+    staffQuery.eq('is_public', true) // 指名可能なスタッフのみ
   }
+  
+  const { data: staffs, error: staffError } = await staffQuery
+  if (staffError || !staffs) return []
   
   const slots: TimeSlot[] = []
   
@@ -227,24 +172,12 @@ export async function generateAvailableSlots(
 
 // 最適なスタッフ自動選択（負荷分散）
 export async function findBestStaff(date: string, startTime: string, durationMinutes: number): Promise<string | null> {
-  let staffs: any[] = []
+  const { data: staffs, error } = await supabaseAdmin
+    .from('staffs')
+    .select('*')
+    .eq('is_active', true)
   
-  if (isDev || !supabaseAdmin) {
-    // 開発環境用のモックスタッフデータ
-    staffs = [
-      { id: 'staff-1', name: '田中', is_active: true, max_parallel: 3 },
-      { id: 'staff-2', name: '佐藤', is_active: true, max_parallel: 2 },
-      { id: 'staff-3', name: '鈴木', is_active: true, max_parallel: 3 }
-    ]
-  } else {
-    const { data: staffData, error } = await supabaseAdmin
-      .from('staffs')
-      .select('*')
-      .eq('is_active', true)
-    
-    if (error || !staffData) return null
-    staffs = staffData
-  }
+  if (error || !staffs) return null
   
   const endTime = dayjs(startTime).add(durationMinutes, 'minute').toISOString()
   
