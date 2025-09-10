@@ -46,7 +46,7 @@ export async function POST(
       )
     }
 
-    const { data: booking, error: fetchError } = await supabaseAdmin
+    const { data: booking, error: fetchError } = await (supabaseAdmin as any)
       .from('bookings')
       .select(`
         *,
@@ -73,7 +73,7 @@ export async function POST(
     }
 
     // キャンセル実行
-    const { error: updateError } = await supabaseAdmin
+    const { error: updateError } = await (supabaseAdmin as any)
       .from('bookings')
       .update({ 
         status: 'canceled',
@@ -147,7 +147,7 @@ export async function GET(
     }
 
     // 予約情報取得
-    const { data: booking, error: fetchError } = await supabaseAdmin
+    const { data: booking, error: fetchError } = await (supabaseAdmin as any)
       .from('bookings')
       .select(`
         *,
