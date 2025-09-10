@@ -65,7 +65,7 @@ export async function POST(
     }
 
     // 既にキャンセル済みチェック
-    if (booking.status === 'canceled') {
+    if ((booking as any).status === 'canceled') {
       return NextResponse.json(
         { error: 'この予約は既にキャンセルされています' },
         { status: 400 }
@@ -167,7 +167,7 @@ export async function GET(
 
     return NextResponse.json({
       booking,
-      can_cancel: booking.status === 'confirmed'
+      can_cancel: (booking as any).status === 'confirmed'
     })
 
   } catch (error) {
