@@ -3,7 +3,8 @@ import { formatDateTime, formatDate, formatTime } from './time'
 import { generateMagicLink, generateShortUrl } from './sign'
 import { createICSAttachment, generateGoogleCalendarLink, ICSEventData } from './ics'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// 環境変数が設定されている場合のみResendインスタンスを作成
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 const FROM_EMAIL = process.env.EMAIL_FROM || 'noreply@example.com'
 const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'クリニック'
 
@@ -146,6 +147,12 @@ export async function sendConfirmationEmail(data: EmailData): Promise<{ success:
       })
       return { success: true, messageId: 'dev-mode' }
     }
+
+    // Resend APIキーが設定されていない場合
+    if (!resend) {
+      console.warn('⚠️ RESEND_API_KEY not configured, email not sent')
+      return { success: false, error: 'Email service not configured' }
+    }
     
     const result = await resend.emails.send(emailOptions)
     
@@ -234,6 +241,12 @@ export async function sendReminderEmail(data: EmailData): Promise<{ success: boo
       })
       return { success: true, messageId: 'dev-mode' }
     }
+
+    // Resend APIキーが設定されていない場合
+    if (!resend) {
+      console.warn('⚠️ RESEND_API_KEY not configured, email not sent')
+      return { success: false, error: 'Email service not configured' }
+    }
     
     const result = await resend.emails.send({
       from: FROM_EMAIL,
@@ -318,6 +331,12 @@ export async function sendCancellationEmail(data: EmailData): Promise<{ success:
         cancelledBooking: data.bookingId
       })
       return { success: true, messageId: 'dev-mode' }
+    }
+
+    // Resend APIキーが設定されていない場合
+    if (!resend) {
+      console.warn('⚠️ RESEND_API_KEY not configured, email not sent')
+      return { success: false, error: 'Email service not configured' }
     }
     
     const result = await resend.emails.send({
