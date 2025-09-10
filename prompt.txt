@@ -1,53 +1,29 @@
-[00:27:30.733] Running build in Washington, D.C., USA (East) – iad1
-[00:27:30.734] Build machine configuration: 2 cores, 8 GB
-[00:27:30.751] Cloning github.com/TAKA1040/yoyaku2 (Branch: main, Commit: 721a1f2)
-[00:27:30.760] Skipping build cache, deployment was triggered without cache.
-[00:27:31.239] Cloning completed: 488.000ms
-[00:27:31.633] Running "vercel build"
-[00:27:32.040] Vercel CLI 47.0.5
-[00:27:32.418] Installing dependencies...
-[00:27:35.416] npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
-[00:27:35.667] npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
-[00:27:36.624] npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
-[00:27:37.870] npm warn deprecated @humanwhocodes/object-schema@2.0.3: Use @eslint/object-schema instead
-[00:27:37.911] npm warn deprecated @humanwhocodes/config-array@0.13.0: Use @eslint/config-array instead
-[00:27:39.808] npm warn deprecated eslint@8.57.1: This version is no longer supported. Please see https://eslint.org/version-support for other options.
-[00:27:45.744] 
-[00:27:45.744] added 511 packages in 13s
-[00:27:45.745] 
-[00:27:45.745] 173 packages are looking for funding
-[00:27:45.746]   run `npm fund` for details
-[00:27:45.799] Detected Next.js version: 14.2.13
-[00:27:45.803] Running "npm run build"
-[00:27:45.914] 
-[00:27:45.914] > yoyaku-mvp@0.1.0 build
-[00:27:45.915] > next build
-[00:27:45.915] 
-[00:27:46.465] Attention: Next.js now collects completely anonymous telemetry regarding usage.
-[00:27:46.466] This information is used to shape Next.js' roadmap and prioritize features.
-[00:27:46.466] You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
-[00:27:46.466] https://nextjs.org/telemetry
-[00:27:46.466] 
-[00:27:46.524]   ▲ Next.js 14.2.13
-[00:27:46.524] 
-[00:27:46.595]    Creating an optimized production build ...
-[00:28:11.298]  ✓ Compiled successfully
-[00:28:11.299]    Linting and checking validity of types ...
-[00:28:15.514] 
-[00:28:15.514] ./app/(public)/manage/page.tsx
-[00:28:15.515] 132:6  Warning: React Hook useEffect has a missing dependency: 'loadBookings'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
-[00:28:15.516] 
-[00:28:15.516] info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules
-[00:28:19.807] Failed to compile.
-[00:28:19.807] 
-[00:28:19.807] ./app/api/book/[id]/cancel/route.ts:43:56
-[00:28:19.807] Type error: 'supabaseAdmin' is possibly 'null'.
-[00:28:19.807] 
-[00:28:19.807] [0m [90m 41 |[39m[0m
-[00:28:19.807] [0m [90m 42 |[39m     [90m// 予約存在チェック[39m[0m
-[00:28:19.808] [0m[31m[1m>[22m[39m[90m 43 |[39m     [36mconst[39m { data[33m:[39m booking[33m,[39m error[33m:[39m fetchError } [33m=[39m [36mawait[39m supabaseAdmin[0m
-[00:28:19.808] [0m [90m    |[39m                                                        [31m[1m^[22m[39m[0m
-[00:28:19.808] [0m [90m 44 |[39m       [33m.[39m[36mfrom[39m([32m'bookings'[39m)[0m
-[00:28:19.808] [0m [90m 45 |[39m       [33m.[39mselect([32m`[39m[0m
-[00:28:19.808] [0m [90m 46 |[39m [32m        *,[39m[0m
-[00:28:19.859] Error: Command "npm run build" exited with 1
+23-22c6c866c5bd6ccd.js:1 Error: supabaseKey is required.
+    at new tV (632-bc1ddfc9c7b2993f.js:21:82538)
+    at tG (632-bc1ddfc9c7b2993f.js:21:86836)
+    at 5536 (page-70f59d8cb8278178.js:1:5399)
+    at d (webpack-d21eebeece071563.js:1:152)
+    at l (23-22c6c866c5bd6ccd.js:2:13004)
+    at 23-22c6c866c5bd6ccd.js:2:18992
+window.console.error @ 23-22c6c866c5bd6ccd.js:1
+fd9d1056-5d6daab34db601ff.js:1 Uncaught Error: Minified React error #423; visit https://react.dev/errors/423 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+    at iZ (fd9d1056-5d6daab34db601ff.js:1:118349)
+    at ia (fd9d1056-5d6daab34db601ff.js:1:95162)
+    at fd9d1056-5d6daab34db601ff.js:1:94984
+    at il (fd9d1056-5d6daab34db601ff.js:1:94991)
+    at oJ (fd9d1056-5d6daab34db601ff.js:1:92347)
+    at oZ (fd9d1056-5d6daab34db601ff.js:1:91766)
+    at MessagePort.T (23-22c6c866c5bd6ccd.js:1:83968)
+fd9d1056-5d6daab34db601ff.js:1 Uncaught Error: supabaseKey is required.
+    at new tV (632-bc1ddfc9c7b2993f.js:21:82538)
+    at tG (632-bc1ddfc9c7b2993f.js:21:86836)
+    at 5536 (page-70f59d8cb8278178.js:1:5399)
+    at d (webpack-d21eebeece071563.js:1:152)
+    at l (23-22c6c866c5bd6ccd.js:2:13004)
+    at 23-22c6c866c5bd6ccd.js:2:18992
+632-bc1ddfc9c7b2993f.js:21 Uncaught (in promise) Error: supabaseKey is required.
+    at new tV (632-bc1ddfc9c7b2993f.js:21:82538)
+    at tG (632-bc1ddfc9c7b2993f.js:21:86836)
+    at 5536 (page-70f59d8cb8278178.js:1:5399)
+    at d (webpack-d21eebeece071563.js:1:152)
+favicon.ico:1  Failed to load resource: the server responded with a status of 404 ()
