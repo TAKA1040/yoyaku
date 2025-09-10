@@ -40,6 +40,10 @@ export async function POST(
     }
 
     // 予約存在チェック
+    if (!supabaseAdmin) {
+      return NextResponse.json({ error: 'Database not available' }, { status: 503 })
+    }
+
     const { data: booking, error: fetchError } = await supabaseAdmin
       .from('bookings')
       .select(`

@@ -24,6 +24,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // データベース接続チェック
+    if (!supabaseAdmin) {
+      return NextResponse.json({ error: 'Database not available' }, { status: 503 })
+    }
+
     // メニュー情報取得
     const { data: menu, error: menuError } = await supabaseAdmin
       .from('menus')
