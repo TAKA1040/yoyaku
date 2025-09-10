@@ -50,7 +50,11 @@ export async function GET(request: NextRequest) {
 
 // メニュー一覧取得
 async function getMenus() {
-  const { data: menus, error } = await supabaseAdmin
+  if (!supabaseAdmin) {
+    throw new Error('データベース接続エラー')
+  }
+  
+  const { data: menus, error } = await (supabaseAdmin as any)
     .from('menus')
     .select('*')
     .order('name')
@@ -64,7 +68,11 @@ async function getMenus() {
 
 // スタッフ一覧取得（指名予約用）
 async function getStaffs() {
-  const { data: staffs, error } = await supabaseAdmin
+  if (!supabaseAdmin) {
+    throw new Error('データベース接続エラー')
+  }
+  
+  const { data: staffs, error } = await (supabaseAdmin as any)
     .from('staffs')
     .select('*')
     .eq('is_active', true)
@@ -80,8 +88,12 @@ async function getStaffs() {
 
 // 利用可能な予約スロット取得
 async function getAvailableSlots(date: string, menuId: string, staffId?: string | null) {
+  if (!supabaseAdmin) {
+    throw new Error('データベース接続エラー')
+  }
+  
   // メニュー情報取得
-  const { data: menu, error: menuError } = await supabaseAdmin
+  const { data: menu, error: menuError } = await (supabaseAdmin as any)
     .from('menus')
     .select('*')
     .eq('id', menuId)
@@ -110,7 +122,11 @@ async function getAvailableSlots(date: string, menuId: string, staffId?: string 
 
 // 営業時間取得
 async function getBusinessHours() {
-  const { data: businessHours, error } = await supabaseAdmin
+  if (!supabaseAdmin) {
+    throw new Error('データベース接続エラー')
+  }
+  
+  const { data: businessHours, error } = await (supabaseAdmin as any)
     .from('business_hours')
     .select('*')
     .order('weekday')

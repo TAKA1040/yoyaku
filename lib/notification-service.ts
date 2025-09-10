@@ -383,7 +383,7 @@ async function logNotification(
   }
   
   try {
-    await supabaseAdmin
+    await (supabaseAdmin as any)
       .from('notification_logs')
       .insert({
         booking_id: bookingId,

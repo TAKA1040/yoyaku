@@ -18,7 +18,11 @@ export interface TimeSlot {
 
 // 営業時間チェック
 export async function getBusinessHours(): Promise<BusinessHour[]> {
-  const { data, error } = await supabaseAdmin
+  if (!supabaseAdmin) {
+    throw new Error('データベース接続エラー')
+  }
+  
+  const { data, error } = await (supabaseAdmin as any)
     .from('business_hours')
     .select('*')
     .order('weekday')
@@ -29,9 +33,13 @@ export async function getBusinessHours(): Promise<BusinessHour[]> {
 
 // 指定日の営業時間を取得
 export async function getBusinessHoursForDate(date: string): Promise<{ openTime: string; closeTime: string; isClosed: boolean }> {
+  if (!supabaseAdmin) {
+    throw new Error('データベース接続エラー')
+  }
+  
   const weekday = dayjs(date).day() // 0=Sunday, 1=Monday, ...
   
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await (supabaseAdmin as any)
     .from('business_hours')
     .select('*')
     .eq('weekday', weekday)
@@ -51,7 +59,11 @@ export async function getBusinessHoursForDate(date: string): Promise<{ openTime:
 
 // スタッフの勤務スケジュール取得
 export async function getStaffSchedule(staffId: string, date: string): Promise<StaffSchedule | null> {
-  const { data, error } = await supabaseAdmin
+  if (!supabaseAdmin) {
+    throw new Error('データベース接続エラー')
+  }
+  
+  const { data, error } = await (supabaseAdmin as any)
     .from('staff_schedules')
     .select('*')
     .eq('staff_id', staffId)
@@ -64,10 +76,14 @@ export async function getStaffSchedule(staffId: string, date: string): Promise<S
 
 // 指定日・スタッフの既存予約を取得
 export async function getExistingBookings(staffId: string, date: string): Promise<Booking[]> {
+  if (!supabaseAdmin) {
+    throw new Error('データベース接続エラー')
+  }
+  
   const startOfDay = dayjs(date).tz(TZ).startOf('day').toISOString()
   const endOfDay = dayjs(date).tz(TZ).endOf('day').toISOString()
   
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await (supabaseAdmin as any)
     .from('bookings')
     .select(`
       *,
@@ -113,7 +129,11 @@ export async function generateAvailableSlots(
   }
   
   // スタッフ一覧取得（指名ありなら対象スタッフのみ）
-  const staffQuery = supabaseAdmin
+  if (!supabaseAdmin) {
+    return []
+  }
+  
+  const staffQuery = (supabaseAdmin as any)
     .from('staffs')
     .select('*')
     .eq('is_active', true)
@@ -172,7 +192,11 @@ export async function generateAvailableSlots(
 
 // 最適なスタッフ自動選択（負荷分散）
 export async function findBestStaff(date: string, startTime: string, durationMinutes: number): Promise<string | null> {
-  const { data: staffs, error } = await supabaseAdmin
+  if (!supabaseAdmin) {
+    return null
+  }
+  
+  const { data: staffs, error } = await (supabaseAdmin as any)
     .from('staffs')
     .select('*')
     .eq('is_active', true)

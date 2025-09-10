@@ -25,8 +25,15 @@ export async function POST(request: NextRequest) {
     }
 
 
+    if (!supabaseAdmin) {
+      return NextResponse.json(
+        { error: 'データベース接続エラー' },
+        { status: 500 }
+      )
+    }
+
     // メニュー情報取得
-    const { data: menu, error: menuError } = await supabaseAdmin
+    const { data: menu, error: menuError } = await (supabaseAdmin as any)
       .from('menus')
       .select('*')
       .eq('id', validatedData.menu_id)
@@ -97,7 +104,7 @@ async function handleBookingManually(
     
     if (validatedData.email) {
       // 既存患者チェック（メールアドレス）
-      const { data: existingPatient } = await supabaseAdmin
+      const { data: existingPatient } = await (supabaseAdmin as any)
         .from('patients')
         .select('id')
         .eq('email', validatedData.email)
@@ -106,7 +113,7 @@ async function handleBookingManually(
       if (existingPatient) {
         patientId = existingPatient.id
         // 名前などの情報を更新
-        await supabaseAdmin
+        await (supabaseAdmin as any)
           .from('patients')
           .update({
             name: validatedData.name,
@@ -116,7 +123,7 @@ async function handleBookingManually(
           .eq('id', patientId)
       } else {
         // 新規患者作成
-        const { data: newPatient, error: patientError } = await supabaseAdmin
+        const { data: newPatient, error: patientError } = await (supabaseAdmin as any)
           .from('patients')
           .insert({
             name: validatedData.name,
@@ -134,7 +141,7 @@ async function handleBookingManually(
       }
     } else {
       // メールアドレスなしの場合は新規作成
-      const { data: newPatient, error: patientError } = await supabaseAdmin
+      const { data: newPatient, error: patientError } = await (supabaseAdmin as any)
         .from('patients')
         .insert({
           name: validatedData.name,
@@ -169,7 +176,7 @@ async function handleBookingManually(
 
     // 3. 重複チェック
     const date = dayjs(startTimeISO).format('YYYY-MM-DD')
-    const { data: existingBookings, error: checkError } = await supabaseAdmin
+    const { data: existingBookings, error: checkError } = await (supabaseAdmin as any)
       .from('bookings')
       .select('start_ts, end_ts')
       .eq('staff_id', assignedStaffId)
@@ -192,7 +199,7 @@ async function handleBookingManually(
     }
 
     // 4. 予約作成
-    const { data: newBooking, error: bookingError } = await supabaseAdmin
+    const { data: newBooking, error: bookingError } = await (supabaseAdmin as any)
       .from('bookings')
       .insert({
         patient_id: patientId,

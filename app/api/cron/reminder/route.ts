@@ -26,8 +26,15 @@ export async function POST(request: NextRequest) {
 
     console.log(`🔔 Running reminder cron for ${tomorrow}`)
 
+    if (!supabaseAdmin) {
+      return NextResponse.json(
+        { error: 'データベース接続エラー' },
+        { status: 500 }
+      )
+    }
+
     // 明日の予約を取得
-    const { data: bookings, error } = await supabaseAdmin
+    const { data: bookings, error } = await (supabaseAdmin as any)
       .from('bookings')
       .select(`
         id,
@@ -73,7 +80,7 @@ export async function POST(request: NextRequest) {
         
         // 既に今日リマインダーを送信済みかチェック
         const today = dayjs().format('YYYY-MM-DD')
-        const { data: existingLog } = await supabaseAdmin
+        const { data: existingLog } = await (supabaseAdmin as any)
           .from('notification_logs')
           .select('id')
           .eq('booking_id', booking.id)

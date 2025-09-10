@@ -14,7 +14,14 @@ export async function GET(request: NextRequest) {
     const date = searchParams.get('date')
     const staffId = searchParams.get('staff_id')
     
-    let query = supabaseAdmin
+    if (!supabaseAdmin) {
+      return NextResponse.json(
+        { error: 'データベース接続エラー' },
+        { status: 500 }
+      )
+    }
+    
+    let query = (supabaseAdmin as any)
       .from('bookings')
       .select(`
         *,

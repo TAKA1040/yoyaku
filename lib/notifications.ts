@@ -25,7 +25,12 @@ async function getBookingNotificationData(bookingId: string): Promise<{
   emailData: EmailData
   smsData: SMSData
 } | null> {
-  const { data: booking, error } = await supabaseAdmin
+  if (!supabaseAdmin) {
+    console.error('Supabase admin client not available')
+    return null
+  }
+  
+  const { data: booking, error } = await (supabaseAdmin as any)
     .from('bookings')
     .select(`
       *,
@@ -71,8 +76,13 @@ async function logNotification(
   event: 'confirm' | 'reminder' | 'changed' | 'canceled',
   result: { success: boolean; messageId?: string; error?: string }
 ): Promise<void> {
+  if (!supabaseAdmin) {
+    console.error('Supabase admin client not available for logging')
+    return
+  }
+  
   try {
-    await supabaseAdmin
+    await (supabaseAdmin as any)
       .from('notification_logs')
       .insert({
         booking_id: bookingId,
